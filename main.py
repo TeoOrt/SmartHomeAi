@@ -232,10 +232,13 @@ res_array = []
 for values in results_array:
     for tester in values[1::2]:
         for vals in tester:
+            if len(res_array) == 51:
+                break
             res_array.append(vals[1])
 
         # print(tester)
         # print(tester[1])
+            
 df = pd.DataFrame(res_array,columns=['Cosine Similarity'])
 df.to_csv('Results.csv',index=False,header=False)
 
