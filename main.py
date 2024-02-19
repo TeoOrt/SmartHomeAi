@@ -237,8 +237,7 @@ for values in results_array:
         # print(tester)
         # print(tester[1])
 df = pd.DataFrame(res_array,columns=['Cosine Similarity'])
-df.to_csv('Results.csv')
-df.shape
+df.to_csv('Results.csv',index=False,header=False)
 
 # %%
 # =============================================================================
