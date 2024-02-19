@@ -178,13 +178,13 @@ class Classifier():
         test_aggregated = [np.mean(np.array(train_gesture), axis=0) for train_gesture in test_item]
 
         for values in range(len(test_item)):
-            max_diff = 10000.0
+            max_diff = 0.0
             prediction_str = ''
             for keys in self.training_map.keys():
                 self.__get_y(self.training_map[keys][values],test_item[values])
                 self.__cosine_similarity()
-                test_val= min(self.cosine_sim.min(),max_diff)
-                if test_val < max_diff:
+                test_val= max(self.cosine_sim.min(),max_diff)
+                if test_val > max_diff:
                     max_diff = test_val
                     prediction_str= keys
             res_.append((prediction_str,max_diff))
@@ -203,7 +203,7 @@ class Classifier():
                 print('Hello')
                 self.__get_y(trained,gestures)
                 self.__cosine_similarity()
-                similar_test_gesture = min(similar_test_gesture,self.cosine_sim)
+                similar_test_gesture = max(similar_test_gesture,self.cosine_sim)
         print(similar_test_gesture,tested)
 
     def __get_y(self,training_data,testing_data):
@@ -212,7 +212,7 @@ class Classifier():
         self.y_true_normalize = tf.nn.l2_normalize(y_true,axis=-1)
         self.y_pred_normalize = tf.nn.l2_normalize(y_pred,axis=-1)
     def __cosine_similarity(self):
-        self.cosine_sim = tf.reduce_sum(tf.multiply(self.y_true_normalize,self.y_pred_normalize), axis = 0).numpy() #returns the prediction result
+        self.cosine_sim = tf.reduce_sum(tf.multiply(self.y_true_normalize,self.y_pred_normalize), axis = 1).numpy() #returns the prediction result
 
 classifier = Classifier(training_set,testing_set)
 # res = classifier.match_closest_result('H-DecreaseFanSpeed')
