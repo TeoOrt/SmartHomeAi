@@ -222,8 +222,6 @@ results_array = []
 for tests in testing_set.keys():
     results_array.append((tests,classifier.match_closest_result(tests)))
 # classifier.individual_testing('H-DecreaseFanSpeed','H-DecreaseFanSpeed')
-for i in results_array:
-    print(i)
 
 
 
@@ -238,8 +236,9 @@ for values in results_array:
 
         # print(tester)
         # print(tester[1])
-df = pd.DataFrame(res_array)
+df = pd.DataFrame(res_array,columns=['Cosine Similarity'])
 df.to_csv('Results.csv')
+df.shape
 
 # %%
 # =============================================================================
