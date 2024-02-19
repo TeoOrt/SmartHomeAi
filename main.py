@@ -173,10 +173,7 @@ class Classifier():
 
     def match_closest_result(self,key_item:str):
         test_item = self.testing_map[key_item]
-        closest_prediciont = ['',100.0]
         res_ = []
-        test_aggregated = [np.mean(np.array(train_gesture), axis=0) for train_gesture in test_item]
-
         for values in range(len(test_item)):
             max_diff = 0.0
             prediction_str = ''
@@ -203,7 +200,7 @@ class Classifier():
                 print('Hello')
                 self.__get_y(trained,gestures)
                 self.__cosine_similarity()
-                similar_test_gesture = max(similar_test_gesture,self.cosine_sim)
+                similar_test_gesture = min(similar_test_gesture,self.cosine_sim)
         print(similar_test_gesture,tested)
 
     def __get_y(self,training_data,testing_data):
@@ -212,7 +209,7 @@ class Classifier():
         self.y_true_normalize = tf.nn.l2_normalize(y_true,axis=-1)
         self.y_pred_normalize = tf.nn.l2_normalize(y_pred,axis=-1)
     def __cosine_similarity(self):
-        self.cosine_sim = tf.reduce_sum(tf.multiply(self.y_true_normalize,self.y_pred_normalize), axis = 1).numpy() #returns the prediction result
+        self.cosine_sim = tf.reduce_sum(tf.multiply(self.y_true_normalize,self.y_pred_normalize), axis = -1).numpy() #returns the prediction result
 
 classifier = Classifier(training_set,testing_set)
 # res = classifier.match_closest_result('H-DecreaseFanSpeed')
@@ -227,6 +224,27 @@ for tests in testing_set.keys():
 
 
 # %%
+result_mapper = {}
+for vals in  training_map.values():
+    result_mapper[vals] = None
+
+result_mapper['H-0'] = 0
+result_mapper['H-1'] = 1
+result_mapper['H-2'] = 2
+result_mapper['H-3'] =3
+result_mapper['H-4'] =4
+result_mapper['H-5'] =5
+result_mapper['H-6'] =6
+result_mapper['H-7'] =7
+result_mapper['H-8'] =8
+result_mapper['H-9'] = 9
+result_mapper['H-DecreaseFanSpeed'] = 10
+result_mapper['H-FanOff'] =11
+result_mapper['H-FanOn'] =12
+result_mapper['H-IncreaseFanSpeed'] =13
+result_mapper['H-LightOff'] = 14
+result_mapper['H-LightOn'] = 15
+result_mapper['H-SetThermo'] =16
 import pandas as pd
 res_array = []
 for values in results_array:
@@ -234,13 +252,14 @@ for values in results_array:
         for vals in tester:
             if len(res_array) == 51:
                 break
-            res_array.append(vals[1])
+            resser = result_mapper[vals[0]]
+            res_array.append(resser)
 
         # print(tester)
         # print(tester[1])
-            
-df = pd.DataFrame(res_array,columns=['Cosine Similarity'])
+df = pd.DataFrame(res_array)
 df.to_csv('Results.csv',index=False,header=False)
+
 
 # %%
 # =============================================================================
