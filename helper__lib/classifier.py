@@ -13,7 +13,7 @@ class Classifier():
             for predictions in values:
                 self.__get_y(predictions,test_item)
                 self.__cosine_similarity()
-                test_val= max(self.cosine_sim.min(),max_diff)
+                test_val= max(self.cosine_sim.max(),max_diff)
                 if test_val > max_diff:
                     max_diff = test_val
                     prediction_str= keys
@@ -27,4 +27,4 @@ class Classifier():
         self.y_true_normalize = tf.nn.l2_normalize(y_true,axis=-1)
         self.y_pred_normalize = tf.nn.l2_normalize(y_pred,axis=-1)
     def __cosine_similarity(self):
-        self.cosine_sim = tf.reduce_sum(tf.multiply(self.y_true_normalize,self.y_pred_normalize), axis = -1).numpy() #returns the prediction result
+        self.cosine_sim = tf.reduce_sum(tf.multiply(self.y_true_normalize,self.y_pred_normalize)).numpy() #returns the prediction result
