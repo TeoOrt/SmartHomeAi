@@ -25,8 +25,7 @@ class HandShapeFeatureExtractor:
 
     def __init__(self):
         if HandShapeFeatureExtractor.__single is None:
-            #real_model = load_model(os.path.join(BASE, 'cnn_model.h5'))
-            real_model = load_model(os.path.join(BASE, 'gestures_trained_cnn_model.h5'))
+            real_model = load_model(os.path.join(BASE, 'cnn_model.h5'))
             self.model = real_model
             HandShapeFeatureExtractor.__single = self
 

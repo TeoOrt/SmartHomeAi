@@ -1,23 +1,12 @@
 # %%
-import cv2
-import numpy as np
+import pandas as pd
 import os
-from training_classifier import Framer
-from label_mapper import Label_mapper, Training_map
-from itertools import repeat
+from helper__lib.training_classifier import Framer
+from helper__lib.label_mapper import Label_mapper, Training_map
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-from classifier import Classifier
-
-# from handshape_feature_extractor import HandShapeFeatureExtractor as FeatExt
-from frameextractor import frameExtractor,frameExtractorWithInvert
-import time
-## import the handfeature extractor class
-from handshape_feature_extractor import HandShapeFeatureExtractor as FeatExt
-from concurrent.futures import ThreadPoolExecutor
-
-
+from helper__lib.classifier import Classifier
 from hfe import HandShapeFeatureExtractor as HFe2
-
+import time
 
 # %%
 # lets map training_sets with our datasets
@@ -34,7 +23,9 @@ training_map = Training_map().get_map()
 # lets get the video features and load in video
 
 # lets get the videos
+print('Starting gathering Training data frames')
 
+start_ = time.perf_counter_ns()
 if not os.path.exists('train_data'):
     os.mkdir('train_data')
 path = os.getcwd() + '/train_data'
@@ -57,19 +48,9 @@ for key,value in video_labels.items():
 
 
 predictionMap = frame_getter.get_label_dump()
-counter = 0 
-for values in predictionMap.values():
-    print(type(values))
-    counter += len(values)
-
-print(counter)
-
-    # writer.writelines(predictionMap.items())
-exit()
-# get images in parallel
-
-print(f'Recorded --> {len(training_frames)}frames for our training data')
-
+end_ = time.perf_counter_ns()
+print('Recorded training frames')
+print(f'Operation took  {end_-start_}')
 # %%
 
 # =============================================================================
@@ -77,6 +58,7 @@ print(f'Recorded --> {len(training_frames)}frames for our training data')
 # =============================================================================
 # your code goes here 
 # Extract the middle frame of each gesture video
+start_ = time.perf_counter_ns()
 if not os.path.exists('test'):
     os.mkdir('test')
 
@@ -90,49 +72,54 @@ frame_getter.set_save_path(testing_path,test_path)
 test_frames = []
 
 for counter,videos in enumerate(dir_list):
-    result = frame_getter.get_frames(videos,counter)
+    result = frame_getter.get_frames_no_labels(videos,counter)
     test_frames.append(result)
-
+end_ = time.perf_counter_ns()
+print('Recorded test frames')
+print(f'Operation took {end_-start_}')
 # %%
-# prediction = FeatExt().get_instance()
+
+
+print('Getting predictions now')
 pred = HFe2().get_instance()
 
-training_sample  =[ pred.get_instance().extract_feature(x) for x in training_frames]
-testing_sample = [pred.get_instance().extract_feature(x) for x in test_frames]
-exit()
+training_sample = {}
 
+for key,values in predictionMap.items():
+    for frames in values:
+        prediction = pred.get_instance().extract_feature(frames)
+        if key not in training_sample:
+            training_sample[key] = [prediction]
+        else:
+            training_sample[key].append(prediction)
+
+testing_sample = []
+for a,values in enumerate(test_frames):
+    testing_sample.append(pred.get_instance().extract_feature(values))
+print('Gathered predictions')
 # %%
 
 # %%
 # =============================================================================
 # Recognize the gesture (use cosine similarity for comparing the vectors)
 # =============================================================================
-
-classifier = Classifier(training_set,testing_set)
-
+print('Classifing data')
+classifier = Classifier(training_sample)
 results_array = []
 
-for tests in testing_set.keys():
-    results_array.append((tests,classifier.match_closest_result(tests)))
+for tests in testing_sample:
+    results_array.append(classifier.match_closest_result(tests))
+
+#######################################
 
 
 
-
-# %%
+print('Recording Data to CSV')
 result_mapper = Label_mapper()
-
-
-import pandas as pd
 result_list = []
 for values in results_array:
-    for tester in values[1::2]:
-        for vals in tester:
-            if len(result_list) == 51:
-                break
-            resser = result_mapper[vals[0]]
-            result_list.append(resser)
-
-
+    res = result_mapper.get_result(values[1])
+    result_list.append(res)
 
 # --------------------------------------------------------
 #               Write to csv file predicitions             
@@ -140,5 +127,5 @@ for values in results_array:
 
 df = pd.DataFrame(result_list)
 df.to_csv('Results.csv',index=False,header=False)
-
+print('Thank you - Project done by Mateo Ortega ')
 
