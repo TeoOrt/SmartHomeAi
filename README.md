@@ -2,6 +2,8 @@
 ## Overview
 This project aims to recognize hand gestures using computer vision techniques and machine learning algorithms. The project involves extracting features from hand gesture videos, generating penultimate layers for training and test datasets, and performing gesture recognition using cosine similarity.
 
+
+
 ## Getting Started
 1.- Get python3.10 for env
 ```
@@ -42,21 +44,26 @@ should look something like this
 
 
 ## Directory Structure
-TODO
-
 ```
-gesture-recognition/
-│
-├── data/
-│   ├── training_videos/
-│   └── test_videos/
-├── src/
-│   ├── feature_extractor.py
-│   ├── classifier.py
-│   └── main.py
-├── results/
-│   └── Results.csv
-└── README.md
+├── cnn_model.h5
+├── frameextractor.py
+├── helper__lib
+│   ├── classifier.py
+│   ├── __init__.py
+│   ├── label_mapper.py
+│   ├── __pycache__
+│   │   ├── classifier.cpython-310.pyc
+│   │   ├── __init__.cpython-310.pyc
+│   │   ├── label_mapper.cpython-310.pyc
+│   │   └── training_classifier.cpython-310.pyc
+│   └── training_classifier.py
+├── hfe.py
+├── main.ipynb
+├── main.py
+├── README.md
+├── requirements.txt
+└── Results.csv
+
 ```
 ## Dependencies
 - Python 3.x
